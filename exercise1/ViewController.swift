@@ -210,7 +210,7 @@ class ViewController: UIViewController {
 
             })
             
-                UIView.addKeyframe(withRelativeStartTime: 2.0, relativeDuration: 1.0/5.0, animations: {
+            UIView.addKeyframe(withRelativeStartTime: 2.0/5.0, relativeDuration: 1.0/5.0, animations: {
                     self.square.frame = CGRect(x: Int(UIScreen.main.bounds.width) - self.width, y: Int(UIScreen.main.bounds.height) - self.height, width: self.width, height: self.height)
 
                 })
