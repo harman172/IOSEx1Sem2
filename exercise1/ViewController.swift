@@ -17,6 +17,10 @@ class ViewController: UIViewController {
     var timer = Timer()
     var downFlag = true
     var swiped = false
+    var topFlag = true
+
+    var leftSwipe = false
+    var rightSwipe = false
     
     @IBOutlet weak var square: UIImageView!
     
@@ -25,6 +29,7 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view.
         
         square.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        downAnimation()
         
 //        UIView.animate(withDuration: 7, delay: 0.1, options: [.autoreverse, .repeat], animations: {
 //
@@ -32,7 +37,7 @@ class ViewController: UIViewController {
 //
 //                }, completion: nil)
 //
-             initializeTimer()
+//             initializeTimer()
 //
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(swipped))
         swipeLeft.direction = UISwipeGestureRecognizer.Direction.left
@@ -44,8 +49,6 @@ class ViewController: UIViewController {
         swipeRight.direction = UISwipeGestureRecognizer.Direction.right
         view.addGestureRecognizer(swipeRight)
 
-
-
     }
     
     func initializeTimer(){
@@ -54,10 +57,11 @@ class ViewController: UIViewController {
     
     @objc func updateTimer(){
         
-        let y = square.frame.origin.y
         
         if downFlag{
             UIView.animate(withDuration: 0.1) {
+                let y = self.square.frame.origin.y
+
                 self.square.frame = CGRect(x: 0, y: Int(y + 15), width: self.width, height: self.height)
             }
             
@@ -65,7 +69,7 @@ class ViewController: UIViewController {
                 timer.invalidate()
                 downFlag = false
                 if swiped{
-                    animations()
+//                    animations()
                 } else{
                     initializeTimer()
                 }
@@ -75,6 +79,8 @@ class ViewController: UIViewController {
             
         } else{
             UIView.animate(withDuration: 0.1) {
+                let y = self.square.frame.origin.y
+
                    self.square.frame = CGRect(x: 0, y: Int(y - 15), width: self.width, height: self.height)
                }
                
@@ -89,6 +95,45 @@ class ViewController: UIViewController {
             }
         }
     
+    func downAnimation(){
+        
+        UIView.animate(withDuration: 2, animations: {
+            self.square.frame = CGRect(x: 0, y: Int(UIScreen.main.bounds.height) - self.height, width: self.width, height: self.height)
+        }) { (a) in
+            
+            if (self.leftSwipe){
+                //C animation
+                print("clockwise")
+                self.ClockwiseAnimations()
+            }else if (self.rightSwipe){
+                // AC animation
+                print("anti-clock")
+                self.CounterClockAnimations()
+            }else{
+                self.upAnimation()
+            }
+        
+            
+        }
+        
+    }
+    
+    func upAnimation(){
+        UIView.animate(withDuration: 2, animations: {
+                 self.square.frame = CGRect(x: 0, y: 0, width: self.width, height: self.height)
+               }) { (a) in
+                
+                if (self.leftSwipe){
+                    //AC animation
+                }else if (self.rightSwipe){
+                    // AC animation
+                }else{
+                    self.downAnimation()
+                }
+                
+               }
+    }
+    
 
     
             
@@ -101,22 +146,23 @@ class ViewController: UIViewController {
 
         case UISwipeGestureRecognizer.Direction.left:
 
-            break
+            leftSwipe = true
+            rightSwipe = false
 
 
         case UISwipeGestureRecognizer.Direction.right:
             
-            if downFlag{
-                
-                swiped = true
-                
-            }
+            leftSwipe = false
+            rightSwipe = true
+            
+//            if downFlag{
+//
+//                swiped = true
+//
+//            }
+//
             
             
-            
-            
-            
-
         
 //            if (square.frame.origin.y <= 100){
 //
@@ -144,10 +190,52 @@ class ViewController: UIViewController {
 
 
     }
-
-func animations(){
     
-    UIView.animateKeyframes(withDuration: 5, delay: 0, options: [.autoreverse], animations: {
+    func ClockwiseAnimations(){
+        
+        
+        UIView.animateKeyframes(withDuration: 5, delay: 0, options: [.autoreverse, .repeat], animations: {
+
+                    // Add animations
+
+            UIView.addKeyframe(withRelativeStartTime: 0/5.0, relativeDuration: 1.0/5.0, animations: {
+
+
+                self.square.frame = CGRect(x: 0, y: 0, width: self.width, height: self.height)
+
+            })
+            UIView.addKeyframe(withRelativeStartTime: 1.0/5.0, relativeDuration: 1.0/5.0, animations: {
+
+                self.square.frame = CGRect(x: Int(UIScreen.main.bounds.width) - self.width, y: 0, width: self.width, height: self.height)
+
+            })
+            
+                UIView.addKeyframe(withRelativeStartTime: 2.0, relativeDuration: 1.0/5.0, animations: {
+                    self.square.frame = CGRect(x: Int(UIScreen.main.bounds.width) - self.width, y: Int(UIScreen.main.bounds.height) - self.height, width: self.width, height: self.height)
+
+                })
+
+
+                
+                UIView.addKeyframe(withRelativeStartTime: 3.0/5.0, relativeDuration: 1.0/5.0, animations: {
+
+
+                    self.square.frame = CGRect(x: 0, y: Int(UIScreen.main.bounds.height) - self.height, width: self.width, height: self.height)
+
+                })
+
+
+            }, completion:{ (complete) in
+                print("complete")
+
+            })
+        
+    }
+
+func CounterClockAnimations(){
+    
+    
+    UIView.animateKeyframes(withDuration: 5, delay: 0, options: [.autoreverse, .repeat], animations: {
 
                 // Add animations
 
@@ -169,16 +257,39 @@ func animations(){
                 self.square.frame = CGRect(x: 0, y: 0, width: self.width, height: self.height)
 
             })
+            UIView.addKeyframe(withRelativeStartTime: 3.0/5.0, relativeDuration: 1.0/5.0, animations: {
 
+
+                self.square.frame = CGRect(x: 0, y: Int(UIScreen.main.bounds.height) - self.height, width: self.width, height: self.height)
+
+            })
 
 
         }, completion:{ (complete) in
-            
             print("complete")
-           
+//            if self.topFlag{
+//                self.square.frame = CGRect(x: 0, y: Int(self.screenHeight) - self.height, width: self.width, height: self.height)
+//
+//                UIView.animate(withDuration: 7) {
+//
+//                    self.square.frame = CGRect(x: 0, y: 0, width: self.width, height: self.height)
+//                }
+//
+//            self.topFlag = false
+//            } else{
+//
+//                UIView.animate(withDuration: 7) {
+//                    self.square.frame = CGRect(x: 0, y: Int(self.screenHeight) - self.height , width: self.width, height: self.height)
+//                }
+//                self.topFlag = true
+//            }
+
+            
+            
+//            self.initializeTimer()
 
         })
-
+    
 }
 
 }
